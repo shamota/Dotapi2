@@ -42,7 +42,7 @@ Add the dotapi2 package to your ```composer.json``` file:
 ```json
 {
     "require": {
-        "sjaakmoes/dotapi2": "~1.0"
+        "shamota/dotapi2": "~1.0"
     }
 }
 ```

@@ -79,6 +79,29 @@ class Guzzle implements HttpClientInterface {
     /**
      * {@inheritDoc}
      */
+    public function sendAsync(Request $request)
+    {
+        $guzzleRequest = $this->convertToGuzzleRequest($request);
+
+        try {
+            $response = $this->client->sendAsync($guzzleRequest, ['query' => $request->getParameters()]);
+        } catch(ClientException $e){
+            if($e->getResponse()->getStatusCode() == 403){
+                throw new InvalidKeyException("No Steam WebAPI key has been provided, or the provided key is invalid.");
+            }
+            throw new RequestException("Something went wrong while accessing the Steam API.", 0, $e);
+        } catch(TransferException $e){
+            throw new RequestException("Something went wrong while accessing the Steam API.", 0, $e);
+        }
+
+        $this->lastRequest = $request;
+        $this->lastResponse = new Response($response->getBody(), $response->getStatusCode(), $response->getHeaders(), $request, $this);
+        return $this->lastResponse;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function getLastResponse()
     {
         return $this->lastResponse;

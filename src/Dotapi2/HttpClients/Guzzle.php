@@ -96,6 +96,7 @@ class Guzzle implements HttpClientInterface {
 
         $this->lastRequest = $request;
         $this->lastResponse = new Response($response->getBody(), $response->getStatusCode(), $response->getHeaders(), $request, $this);
+
         return $this->lastResponse;
     }
 

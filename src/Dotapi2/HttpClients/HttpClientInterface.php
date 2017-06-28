@@ -22,6 +22,15 @@ interface HttpClientInterface {
     public function send(Request $request);
 
     /**
+     * Send an async request
+     *
+     * @param Request $request
+     *
+     * @return Response
+     */
+    public function sendAsync(Request $request);
+
+    /**
      * Get the last response
      *
      * @return Response|null

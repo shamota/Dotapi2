@@ -10,6 +10,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\Psr7\Request as GuzzleRequest;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * Guzzle HttpClient
@@ -82,9 +83,8 @@ class Guzzle implements HttpClientInterface {
     public function sendAsync(Request $request)
     {
         $guzzleRequest = $this->convertToGuzzleRequest($request);
-
         try {
-            $response = $this->client->sendAsync($guzzleRequest, ['query' => $request->getParameters()]);
+            $promise = $this->client->sendAsync($guzzleRequest, ['query' => $request->getParameters()]);
         } catch(ClientException $e){
             if($e->getResponse()->getStatusCode() == 403){
                 throw new InvalidKeyException("No Steam WebAPI key has been provided, or the provided key is invalid.");
@@ -95,6 +95,11 @@ class Guzzle implements HttpClientInterface {
         }
 
         $this->lastRequest = $request;
+
+        $response = $promise->wait(function (ResponseInterface $response) use($request) {
+            return $response;
+        });
+
         $this->lastResponse = new Response($response->getBody(), $response->getStatusCode(), $response->getHeaders(), $request, $this);
 
         return $this->lastResponse;
